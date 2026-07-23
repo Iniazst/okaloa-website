@@ -1,0 +1,286 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { sanityClient, portableTextToHtml } from '../utils/sanity';
+
+let content = null;
+let events = [];
+
+try {
+  content = await sanityClient.fetch(`*[_type == "homepage" && (_id == "homepage" || _id == "drafts.homepage")] | order(_updatedAt desc)[0]{
+    heroHeadline,
+    heroText,
+    deriskingText,
+    engageText,
+    whenText,
+    aboutText
+  }`);
+  
+  events = await sanityClient.fetch(`*[_type == "event"] | order(date asc){
+    "id": _id,
+    title,
+    date,
+    description,
+    link
+  }`);
+} catch (e) {
+  console.error("Failed to fetch from Sanity:", e);
+}
+
+// Select active data
+const homepage = content || {};
+const finalEvents = events || [];
+---
+
+<Layout title="Strategic Agility & Flow Simulations" description="Measure and improve strategic agility and collaboration through experiential simulation dojos.">
+  
+  <!-- Hero / Attention Grabber Section (Dark landing part) -->
+  <header class="hero-section" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="container hero-inner">
+      <h1 class="hero-headline">
+        {homepage.heroHeadline || ''}
+      </h1>
+      <div class="hero-text">
+        {homepage.heroText ? (
+          <Fragment set:html={portableTextToHtml(homepage.heroText)} />
+        ) : null}
+      </div>
+      <div class="hero-actions">
+        <a href="#de-risking" class="btn btn-primary">Discover More</a>
+        <a href="#events" class="btn btn-secondary">Upcoming Events</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- De-risking (How Part - Light background) -->
+  <section class="section section-light" id="de-risking">
+    <div class="container-narrow">
+      <h2>De-risking</h2>
+      <div class="section-content">
+        {homepage.deriskingText ? (
+          <Fragment set:html={portableTextToHtml(homepage.deriskingText)} />
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <!-- How we engage (What Part - Soft background) -->
+  <section class="section section-soft" id="how-we-engage">
+    <div class="container-narrow">
+      <h2>How we engage</h2>
+      <div class="section-content">
+        {homepage.engageText ? (
+          <Fragment set:html={portableTextToHtml(homepage.engageText)} />
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <!-- Is this for you (When Part - Light background) -->
+  <section class="section section-light" id="is-this-for-you">
+    <div class="container-narrow">
+      <h2>Is this for you?</h2>
+      <div class="section-content">
+        {homepage.whenText ? (
+          <Fragment set:html={portableTextToHtml(homepage.whenText)} />
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section (Soft background) -->
+  <section class="section section-soft" id="about">
+    <div class="container-narrow">
+      <h2>About</h2>
+      <div class="section-content">
+        {homepage.aboutText ? (
+          <Fragment set:html={portableTextToHtml(homepage.aboutText)} />
+        ) : null}
+      </div>
+    </div>
+  </section>
+
+  <!-- Upcoming Events Section (Light background) -->
+  <section class="section section-light" id="events">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2>Upcoming Events</h2>
+        <p class="section-subheader">Join our live simulation workshops and dojo training sessions.</p>
+      </div>
+
+      <div class="grid-2 events-grid">
+        {finalEvents.map(event => (
+          <div class="card event-card">
+            <div class="event-meta">
+              <span class="event-date">
+                {new Date(event.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </span>
+            </div>
+            <h3>{event.title}</h3>
+            {event.description && <p class="event-desc">{event.description}</p>}
+            {event.link && (
+              <a href={event.link} target="_blank" class="btn btn-secondary btn-sm event-link" id={`btn-event-${event.id || event._id}`}>
+                Register Now &rarr;
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .text-center {
+    text-align: center;
+  }
+  
+  /* Hero Section Styling (Dark Landing Part) */
+  .hero-section {
+    position: relative;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 11rem 2rem 7rem;
+    background-color: var(--color-bg-dark-hero);
+    overflow: hidden;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    /* Subtle red overlay glow matching Okaloa brand red */
+    background: radial-gradient(circle at center, rgba(227, 89, 61, 0.12) 0%, rgba(37, 52, 55, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: var(--container-narrow-width);
+  }
+  
+  .hero-headline {
+    font-size: clamp(2.3rem, 5.2vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-neutral-white);
+    margin-bottom: var(--space-md);
+  }
+  
+  .hero-text p,
+  .hero-text :global(p) {
+    font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+    line-height: 1.65;
+    color: var(--color-neutral-white) !important;
+    margin-bottom: var(--space-md);
+  }
+  
+  .hero-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-lg);
+  }
+
+  /* Specific hero secondary button style */
+  .hero-section .btn-secondary {
+    color: var(--color-neutral-white);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  .hero-section .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-brand-red);
+  }
+  
+  /* Section Labels (Eyebrows) */
+  .section-label {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-brand-red);
+    margin-bottom: var(--space-xs);
+  }
+  
+  .section-content :global(p) {
+    font-size: 1.15rem;
+    line-height: 1.75;
+    color: var(--color-text-dark-muted);
+    margin-bottom: var(--space-md);
+  }
+  
+  .section-content :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  
+
+  
+  /* Events Grid Styling */
+  .section-header {
+    max-width: 600px;
+    margin: 0 auto var(--space-xl);
+  }
+  
+  .section-subheader {
+    font-size: 1.1rem;
+    color: var(--color-text-dark-muted);
+  }
+  
+  .events-grid {
+    align-items: stretch;
+  }
+  
+  .event-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+  
+  .event-meta {
+    margin-bottom: var(--space-xs);
+  }
+  
+  .event-date {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-brand-red);
+    letter-spacing: 0.05em;
+  }
+  
+  .event-card h3 {
+    font-size: 1.35rem;
+    margin-bottom: var(--space-xs);
+  }
+  
+  .event-desc {
+    font-size: 0.98rem;
+    flex-grow: 1;
+    color: var(--color-text-dark-muted);
+    margin-bottom: var(--space-md);
+  }
+  
+  .event-link {
+    align-self: flex-start;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+</style>
