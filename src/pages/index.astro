@@ -83,9 +83,12 @@ const aboutSec = homepage.aboutSection;
         </div>
       )}
 
-      <div class="hero-actions">
-        <a href="#de-risking" class="btn btn-primary">Discover More</a>
-        <a href="#events" class="btn btn-secondary">Upcoming Events</a>
+      <div class="scroll-down-container">
+        <a href="#de-risking" class="scroll-down-btn" aria-label="Scroll to De-risking section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </a>
       </div>
     </div>
   </header>
@@ -224,22 +227,46 @@ const aboutSec = homepage.aboutSection;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
   
-  .hero-actions {
+  .scroll-down-container {
     display: flex;
-    gap: var(--space-sm);
     justify-content: center;
-    flex-wrap: wrap;
-    margin-top: var(--space-lg);
+    margin-top: var(--space-xl);
   }
 
-  .hero-section .btn-secondary {
+  .scroll-down-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
     color: var(--color-neutral-white);
-    border-color: rgba(255, 255, 255, 0.25);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: scroll-bounce 2.2s infinite;
+    cursor: pointer;
   }
-  
-  .hero-section .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+
+  .scroll-down-btn:hover {
+    background: var(--color-brand-red);
     border-color: var(--color-brand-red);
+    color: var(--color-neutral-white);
+    transform: translateY(3px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(227, 89, 61, 0.4);
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll-bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(6px);
+    }
+    60% {
+      transform: translateY(3px);
+    }
   }
   
   /* Events Grid Styling */
