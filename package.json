@@ -1,5 +1,5 @@
 {
-  "name": "opposite-osiris",
+  "name": "okaloa-website",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -9,7 +9,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy:website": "vercel --prod",
+    "deploy:studio": "npm --prefix studio run deploy",
+    "deploy": "npm run deploy:website && npm run deploy:studio"
   },
   "dependencies": {
     "@astrojs/vercel": "^11.0.3",
