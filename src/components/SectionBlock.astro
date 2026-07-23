@@ -1,0 +1,125 @@
+---
+import { portableTextToHtml, urlForImage } from '../utils/sanity';
+
+interface Props {
+  id: string;
+  title: string;
+  section?: {
+    text1?: any[];
+    image1?: any;
+    text2?: any[];
+    image2?: any;
+    text3?: any[];
+  };
+  bgClass?: string;
+}
+
+const { id, title, section, bgClass = 'section-light' } = Astro.props;
+
+const text1 = section?.text1;
+const image1Url = section?.image1 ? urlForImage(section.image1) : null;
+const image1Alt = section?.image1?.alt || `${title} Image 1`;
+const image1Caption = section?.image1?.caption;
+
+const text2 = section?.text2;
+const image2Url = section?.image2 ? urlForImage(section.image2) : null;
+const image2Alt = section?.image2?.alt || `${title} Image 2`;
+const image2Caption = section?.image2?.caption;
+
+const text3 = section?.text3;
+---
+
+<section class={`section ${bgClass}`} id={id}>
+  <div class="container-narrow">
+    <h2>{title}</h2>
+    <div class="section-content section-grid-layout">
+      {/* Text 1 */}
+      {text1 && text1.length > 0 && (
+        <div class="block-text text-1">
+          <Fragment set:html={portableTextToHtml(text1)} />
+        </div>
+      )}
+
+      {/* Image 1 */}
+      {image1Url && (
+        <figure class="block-image image-1">
+          <img src={image1Url} alt={image1Alt} loading="lazy" />
+          {image1Caption && <figcaption>{image1Caption}</figcaption>}
+        </figure>
+      )}
+
+      {/* Text 2 */}
+      {text2 && text2.length > 0 && (
+        <div class="block-text text-2">
+          <Fragment set:html={portableTextToHtml(text2)} />
+        </div>
+      )}
+
+      {/* Image 2 */}
+      {image2Url && (
+        <figure class="block-image image-2">
+          <img src={image2Url} alt={image2Alt} loading="lazy" />
+          {image2Caption && <figcaption>{image2Caption}</figcaption>}
+        </figure>
+      )}
+
+      {/* Text 3 */}
+      {text3 && text3.length > 0 && (
+        <div class="block-text text-3">
+          <Fragment set:html={portableTextToHtml(text3)} />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .block-text :global(p) {
+    font-size: 1.15rem;
+    line-height: 1.75;
+    color: var(--color-text-dark-muted);
+    margin-bottom: var(--space-sm);
+  }
+
+  .block-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .block-image {
+    margin: var(--space-sm) 0;
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .block-image:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+  }
+
+  .block-image img {
+    width: 100%;
+    height: auto;
+    max-height: 480px;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-md);
+  }
+
+  figcaption {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.88rem;
+    font-style: italic;
+    color: var(--color-text-dark-muted);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+  }
+</style>

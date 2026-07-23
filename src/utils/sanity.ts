@@ -1,4 +1,5 @@
 import {createClient} from '@sanity/client'
+import imageUrlBuilder from '@sanity/image-url'
 
 export const sanityClient = createClient({
   projectId: 'b7wqv3yo',
@@ -6,6 +7,22 @@ export const sanityClient = createClient({
   useCdn: false, // Set to false to bypass cache and get fresh content immediately in development
   apiVersion: '2024-01-01'
 })
+
+// Use factory directly to support最新 API without deprecation warning
+const builder = imageUrlBuilder(sanityClient)
+
+export function urlForImage(source: any): string | null {
+  if (!source) return null;
+  if (typeof source === 'string') return source;
+  if (source.asset) {
+    try {
+      return builder.image(source).auto('format').url();
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
 
 export function portableTextToHtml(blocks: any[]): string {
   if (!blocks || !Array.isArray(blocks)) return '';

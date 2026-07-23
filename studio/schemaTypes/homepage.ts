@@ -2,10 +2,10 @@ import {defineType, defineField} from 'sanity'
 
 export default defineType({
   name: 'homepage',
-  title: 'Homepage Sections',
+  title: 'Homepage Content',
   type: 'document',
   fields: [
-    // Attention Grabber
+    // Attention Grabber (Hero)
     defineField({
       name: 'heroHeadline',
       title: 'Attention Grabber Title',
@@ -13,47 +13,42 @@ export default defineType({
       description: 'The main bold title text at the top of the homepage.'
     }),
     defineField({
-      name: 'heroText',
-      title: 'Attention Grabber Text',
-      type: 'array',
-      of: [{type: 'block'}],
-      description: 'The text block underneath the attention grabber title.'
+      name: 'heroSection',
+      title: 'Attention Grabber / Hero Section',
+      type: 'sectionContent',
+      description: 'Hero section 5-part layout (Text 1, Image 1, Text 2, Image 2, Text 3).'
     }),
 
-    // De-risking
+    // De-risking Section
     defineField({
-      name: 'deriskingText',
-      title: 'De-risking Text',
-      type: 'array',
-      of: [{type: 'block'}],
-      description: 'The text content for the De-risking section.'
+      name: 'deriskingSection',
+      title: 'De-risking Section',
+      type: 'sectionContent',
+      description: 'De-risking section 5-part layout (Text 1, Image 1, Text 2, Image 2, Text 3).'
     }),
 
-    // How we engage
+    // How We Engage Section
     defineField({
-      name: 'engageText',
-      title: 'How We Engage Text',
-      type: 'array',
-      of: [{type: 'block'}],
-      description: 'The text content for the How We Engage section.'
+      name: 'engageSection',
+      title: 'How We Engage Section',
+      type: 'sectionContent',
+      description: 'How We Engage section 5-part layout (Text 1, Image 1, Text 2, Image 2, Text 3).'
     }),
 
-    // Is this for you
+    // Is This For You Section
     defineField({
-      name: 'whenText',
-      title: 'Is This For You Text',
-      type: 'array',
-      of: [{type: 'block'}],
-      description: 'The text content for the Is This For You section.'
+      name: 'whenSection',
+      title: 'Is This For You Section',
+      type: 'sectionContent',
+      description: 'Is This For You section 5-part layout (Text 1, Image 1, Text 2, Image 2, Text 3).'
     }),
 
-    // About
+    // About Section
     defineField({
-      name: 'aboutText',
-      title: 'About Text',
-      type: 'array',
-      of: [{type: 'block'}],
-      description: 'The text content for the About section.'
-    })
+      name: 'aboutSection',
+      title: 'About Section',
+      type: 'sectionContent',
+      description: 'About section 5-part layout (Text 1, Image 1, Text 2, Image 2, Text 3).'
+    }),
   ]
 })

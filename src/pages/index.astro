@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { sanityClient, portableTextToHtml } from '../utils/sanity';
+import SectionBlock from '../components/SectionBlock.astro';
+import { sanityClient, portableTextToHtml, urlForImage } from '../utils/sanity';
 
 let content = null;
 let events = [];
@@ -8,11 +9,11 @@ let events = [];
 try {
   content = await sanityClient.fetch(`*[_type == "homepage" && (_id == "homepage" || _id == "drafts.homepage")] | order(_updatedAt desc)[0]{
     heroHeadline,
-    heroText,
-    deriskingText,
-    engageText,
-    whenText,
-    aboutText
+    heroSection,
+    deriskingSection,
+    engageSection,
+    whenSection,
+    aboutSection
   }`);
   
   events = await sanityClient.fetch(`*[_type == "event"] | order(date asc){
@@ -23,28 +24,63 @@ try {
     link
   }`);
 } catch (e) {
-  console.error("Failed to fetch from Sanity:", e);
+  console.error("Failed to fetch content from Sanity CMS:", e);
 }
 
-// Select active data
 const homepage = content || {};
 const finalEvents = events || [];
+
+const heroHeadline = homepage.heroHeadline;
+const heroSec = homepage.heroSection;
+const deriskingSec = homepage.deriskingSection;
+const engageSec = homepage.engageSection;
+const whenSec = homepage.whenSection;
+const aboutSec = homepage.aboutSection;
 ---
 
 <Layout title="Strategic Agility & Flow Simulations" description="Measure and improve strategic agility and collaboration through experiential simulation dojos.">
   
-  <!-- Hero / Attention Grabber Section (Dark landing part) -->
+  <!-- Hero / Attention Grabber Section -->
   <header class="hero-section" id="hero">
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
-      <h1 class="hero-headline">
-        {homepage.heroHeadline || ''}
-      </h1>
-      <div class="hero-text">
-        {homepage.heroText ? (
-          <Fragment set:html={portableTextToHtml(homepage.heroText)} />
-        ) : null}
-      </div>
+      {heroHeadline && (
+        <h1 class="hero-headline">
+          {heroHeadline}
+        </h1>
+      )}
+      
+      {/* Hero Section Content Layout: text1, image1, text2, image2, text3 */}
+      {heroSec && (
+        <div class="hero-content-flow">
+          {heroSec.text1 && heroSec.text1.length > 0 && (
+            <div class="hero-text">
+              <Fragment set:html={portableTextToHtml(heroSec.text1)} />
+            </div>
+          )}
+          {heroSec.image1 && (
+            <div class="hero-image">
+              <img src={urlForImage(heroSec.image1)} alt={heroSec.image1?.alt || 'Hero Image'} />
+            </div>
+          )}
+          {heroSec.text2 && heroSec.text2.length > 0 && (
+            <div class="hero-text">
+              <Fragment set:html={portableTextToHtml(heroSec.text2)} />
+            </div>
+          )}
+          {heroSec.image2 && (
+            <div class="hero-image">
+              <img src={urlForImage(heroSec.image2)} alt={heroSec.image2?.alt || 'Hero Image'} />
+            </div>
+          )}
+          {heroSec.text3 && heroSec.text3.length > 0 && (
+            <div class="hero-text">
+              <Fragment set:html={portableTextToHtml(heroSec.text3)} />
+            </div>
+          )}
+        </div>
+      )}
+
       <div class="hero-actions">
         <a href="#de-risking" class="btn btn-primary">Discover More</a>
         <a href="#events" class="btn btn-secondary">Upcoming Events</a>
@@ -52,55 +88,39 @@ const finalEvents = events || [];
     </div>
   </header>
 
-  <!-- De-risking (How Part - Light background) -->
-  <section class="section section-light" id="de-risking">
-    <div class="container-narrow">
-      <h2>De-risking</h2>
-      <div class="section-content">
-        {homepage.deriskingText ? (
-          <Fragment set:html={portableTextToHtml(homepage.deriskingText)} />
-        ) : null}
-      </div>
-    </div>
-  </section>
+  <!-- De-risking Section -->
+  <SectionBlock
+    id="de-risking"
+    title="De-risking"
+    section={deriskingSec}
+    bgClass="section-light"
+  />
 
-  <!-- How we engage (What Part - Soft background) -->
-  <section class="section section-soft" id="how-we-engage">
-    <div class="container-narrow">
-      <h2>How we engage</h2>
-      <div class="section-content">
-        {homepage.engageText ? (
-          <Fragment set:html={portableTextToHtml(homepage.engageText)} />
-        ) : null}
-      </div>
-    </div>
-  </section>
+  <!-- How We Engage Section -->
+  <SectionBlock
+    id="how-we-engage"
+    title="How we engage"
+    section={engageSec}
+    bgClass="section-soft"
+  />
 
-  <!-- Is this for you (When Part - Light background) -->
-  <section class="section section-light" id="is-this-for-you">
-    <div class="container-narrow">
-      <h2>Is this for you?</h2>
-      <div class="section-content">
-        {homepage.whenText ? (
-          <Fragment set:html={portableTextToHtml(homepage.whenText)} />
-        ) : null}
-      </div>
-    </div>
-  </section>
+  <!-- Is This For You Section -->
+  <SectionBlock
+    id="is-this-for-you"
+    title="Is this for you?"
+    section={whenSec}
+    bgClass="section-light"
+  />
 
-  <!-- About Us Section (Soft background) -->
-  <section class="section section-soft" id="about">
-    <div class="container-narrow">
-      <h2>About</h2>
-      <div class="section-content">
-        {homepage.aboutText ? (
-          <Fragment set:html={portableTextToHtml(homepage.aboutText)} />
-        ) : null}
-      </div>
-    </div>
-  </section>
+  <!-- About Section -->
+  <SectionBlock
+    id="about"
+    title="About"
+    section={aboutSec}
+    bgClass="section-soft"
+  />
 
-  <!-- Upcoming Events Section (Light background) -->
+  <!-- Upcoming Events Section -->
   <section class="section section-light" id="events">
     <div class="container">
       <div class="section-header text-center">
@@ -108,28 +128,34 @@ const finalEvents = events || [];
         <p class="section-subheader">Join our live simulation workshops and dojo training sessions.</p>
       </div>
 
-      <div class="grid-2 events-grid">
-        {finalEvents.map(event => (
-          <div class="card event-card">
-            <div class="event-meta">
-              <span class="event-date">
-                {new Date(event.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </span>
+      {finalEvents.length > 0 ? (
+        <div class="grid-2 events-grid">
+          {finalEvents.map(event => (
+            <div class="card event-card">
+              <div class="event-meta">
+                <span class="event-date">
+                  {new Date(event.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+              <h3>{event.title}</h3>
+              {event.description && <p class="event-desc">{event.description}</p>}
+              {event.link && (
+                <a href={event.link} target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm event-link" id={`btn-event-${event.id || event._id}`}>
+                  Register Now &rarr;
+                </a>
+              )}
             </div>
-            <h3>{event.title}</h3>
-            {event.description && <p class="event-desc">{event.description}</p>}
-            {event.link && (
-              <a href={event.link} target="_blank" class="btn btn-secondary btn-sm event-link" id={`btn-event-${event.id || event._id}`}>
-                Register Now &rarr;
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div class="empty-events text-center">
+          <p>No upcoming events currently scheduled. Check back soon!</p>
+        </div>
+      )}
     </div>
   </section>
 </Layout>
@@ -139,7 +165,7 @@ const finalEvents = events || [];
     text-align: center;
   }
   
-  /* Hero Section Styling (Dark Landing Part) */
+  /* Hero Section Styling */
   .hero-section {
     position: relative;
     min-height: 85vh;
@@ -155,7 +181,6 @@ const finalEvents = events || [];
   .hero-overlay {
     position: absolute;
     inset: 0;
-    /* Subtle red overlay glow matching Okaloa brand red */
     background: radial-gradient(circle at center, rgba(227, 89, 61, 0.12) 0%, rgba(37, 52, 55, 0) 70%);
     pointer-events: none;
     z-index: 1;
@@ -175,16 +200,26 @@ const finalEvents = events || [];
     margin-bottom: var(--space-md);
   }
   
+  .hero-content-flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
   .hero-text p,
   .hero-text :global(p) {
     font-size: clamp(1.1rem, 1.5vw, 1.25rem);
     line-height: 1.65;
     color: var(--color-neutral-white) !important;
-    margin-bottom: var(--space-md);
-  }
-  
-  .hero-text :global(p:last-child) {
     margin-bottom: 0;
+  }
+
+  .hero-image img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
   
   .hero-actions {
@@ -195,7 +230,6 @@ const finalEvents = events || [];
     margin-top: var(--space-lg);
   }
 
-  /* Specific hero secondary button style */
   .hero-section .btn-secondary {
     color: var(--color-neutral-white);
     border-color: rgba(255, 255, 255, 0.25);
@@ -205,30 +239,6 @@ const finalEvents = events || [];
     background-color: rgba(255, 255, 255, 0.08);
     border-color: var(--color-brand-red);
   }
-  
-  /* Section Labels (Eyebrows) */
-  .section-label {
-    font-family: var(--font-sans);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-brand-red);
-    margin-bottom: var(--space-xs);
-  }
-  
-  .section-content :global(p) {
-    font-size: 1.15rem;
-    line-height: 1.75;
-    color: var(--color-text-dark-muted);
-    margin-bottom: var(--space-md);
-  }
-  
-  .section-content :global(p:last-child) {
-    margin-bottom: 0;
-  }
-  
-
   
   /* Events Grid Styling */
   .section-header {
@@ -282,5 +292,11 @@ const finalEvents = events || [];
     padding: var(--space-xs) var(--space-sm);
     font-size: 0.9rem;
     font-weight: 600;
+  }
+
+  .empty-events p {
+    font-size: 1.05rem;
+    color: var(--color-text-dark-muted);
+    font-style: italic;
   }
 </style>
